@@ -19,6 +19,8 @@ public class MainActivity extends AppCompatActivity {
     Button scanQr;
     EditText input;
     private static final int SCAN_REQUEST_ZXING_SCANNER = 111;
+    private int width;
+    private int height;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +30,8 @@ public class MainActivity extends AppCompatActivity {
         scanQr = (Button) findViewById(R.id.btn_scan);
         input = (EditText) findViewById(R.id.et_input);
         qrImage = (ImageView) findViewById(R.id.iv_qr);
+        width = DeviceUtil.getScreenWidth(this);
+        height = DeviceUtil.getScreenHeight(this);
         createQr.setOnClickListener(new View.OnClickListener() {
             final String filePath = getExternalCacheDir().getPath()
                     + "qr_" + System.currentTimeMillis() + ".jpg";
@@ -38,8 +42,8 @@ public class MainActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        boolean success = QRCodeUtil.createQRImage(input.getText().toString(), 800, 800,
-                                BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher), filePath);
+                        boolean success = QRCodeUtil.createQRImage(input.getText().toString(), 2 * width / 3, height / 3,
+                                null, filePath);
                         if (success) {
                             runOnUiThread(new Runnable() {
                                 @Override
