@@ -13,6 +13,8 @@ import android.widget.Toast;
 
 import com.bolex.pressscan.ScanTools;
 
+import java.io.File;
+
 public class MainActivity extends AppCompatActivity {
     ImageView qrImage;
     Button createQr;
@@ -33,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
         width = DeviceUtil.getScreenWidth(this);
         height = DeviceUtil.getScreenHeight(this);
         createQr.setOnClickListener(new View.OnClickListener() {
-            final String filePath = getExternalCacheDir().getPath()
+            final String filePath = getExternalCacheDir().getPath()+ File.separator
                     + "qr_" + System.currentTimeMillis() + ".jpg";
 
             @Override
@@ -42,13 +44,13 @@ public class MainActivity extends AppCompatActivity {
                 new Thread(new Runnable() {
                     @Override
                     public void run() {
-                        boolean success = QRCodeUtil.createQRImage(input.getText().toString(), 2 * width / 3, height / 3,
+                        boolean success = QRCodeUtil.createQRImage(input.getText().toString(),  400, 400,
                                 null, filePath);
                         if (success) {
                             runOnUiThread(new Runnable() {
                                 @Override
                                 public void run() {
-                                    Toast.makeText(MainActivity.this, "二维码生成成功,扫描或长按二维码即可识别", Toast.LENGTH_LONG).show();
+                                    Toast.makeText(MainActivity.this, "二维码生成成功,扫描或长按二维码即可识别", Toast.LENGTH_SHORT).show();
                                     qrImage.setImageBitmap(BitmapFactory.decodeFile(filePath));
                                 }
                             });

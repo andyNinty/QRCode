@@ -2,6 +2,7 @@ package cn.andyleeblog.qrdemo;
 
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -42,20 +43,21 @@ public class QRCodeUtil {
             hints.put(EncodeHintType.CHARACTER_SET, "utf-8");
             //容错级别
             hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-            //设置空白边距的宽度
-//            hints.put(EncodeHintType.MARGIN, 2); //default is 4
+            //设置空白边距的宽度 然而并没有什么卵用
+            hints.put(EncodeHintType.MARGIN, 1); //default is 4
 
             // 图像数据转换，使用了矩阵转换
             BitMatrix bitMatrix = new QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, widthPix, heightPix, hints);
+//            bitMatrix = deleteWhite(bitMatrix);//删除白边 会报错 同样没有什么卵用
             int[] pixels = new int[widthPix * heightPix];
             // 下面这里按照二维码的算法，逐个生成二维码的图片，
             // 两个for循环是图片横列扫描的结果
             for (int y = 0; y < heightPix; y++) {
                 for (int x = 0; x < widthPix; x++) {
                     if (bitMatrix.get(x, y)) {
-                        pixels[y * widthPix + x] = 0xff000000;
+                        pixels[y * widthPix + x] = Color.BLACK;
                     } else {
-                        pixels[y * widthPix + x] = 0xffffffff;
+                        pixels[y * widthPix + x] = Color.WHITE;
                     }
                 }
             }
@@ -124,5 +126,27 @@ public class QRCodeUtil {
         }
 
         return bitmap;
+    }
+
+    /**
+     * 去白边的方法 但是实验不行 总是会报数组下标越界
+     *
+     * @param matrix
+     * @return
+     */
+    private static BitMatrix deleteWhite(BitMatrix matrix) {
+        int[] rec = matrix.getEnclosingRectangle();
+        int resWidth = rec[2] + 1;
+        int resHeight = rec[3] + 1;
+
+        BitMatrix resMatrix = new BitMatrix(resWidth, resHeight);
+        resMatrix.clear();
+        for (int i = 0; i < resWidth; i++) {
+            for (int j = 0; j < resHeight; j++) {
+                if (matrix.get(i + rec[0], j + rec[1]))
+                    resMatrix.set(i, j);
+            }
+        }
+        return resMatrix;
     }
 }
